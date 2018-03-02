@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">NetworkAnalyzer</string>
+
+    <!-- super permission-->
+    <string name="grant_super">Grant root permission</string>
+    <string name="super_granted">Root permission granted</string>
+    <string name="title_grant_super_failed">Root failed</string>
+    <string name="msg_grant_super_failed">Grant root permission failed, please open root permission for NetworkAnalyzer in SecurityCenter and reboot me!</string>
+    <string name="go_now">Go now</string>
+    <string name="info_no_super">Please grant root permission first!</string>
+
+    <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_abort">Abort</string>
+    <string name="dlg_continue">Continue</string>
+
+    <!-- wechat xlog -->
+    <string name="xlog_hack">One key hack wechat</string>
+    <string name="xlog_hack_dlg_title">Hack wechat</string>
+    <string name="xlog_hack_dlg_warning">Hack wechat may cause wechat stop, are you sure to continue?</string>
+    <string name="xlog_hack_running">Hacking process is running...</string>
+    <string name="xlog_hack_hacked">Wechat is hacked</string>
+    <string name="xlog_hack_failed">Wechat hack failed, try again</string>
+
+    <string name="network_monitor">One key network monitor</string>
+    <string name="capture_tcpdump">Capture tcpdump</string>
+    <string name="connection_monitor">Tcp connection monitor</string>
+</resources>
