@@ -21,6 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.MessageDelayActivity" />
+
         <service android:name=".service.AnalyzerService"
             android:process="com.ulangch.networkanalyzer.analyzerservice">
             <intent-filter>

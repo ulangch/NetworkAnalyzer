@@ -2,11 +2,14 @@
     <string name="app_name">NetworkAnalyzer</string>
 
     <!-- super permission-->
-    <string name="grant_super">Grant root permission</string>
-    <string name="super_granted">Root permission granted</string>
-    <string name="title_grant_super_failed">Root failed</string>
-    <string name="msg_grant_super_failed">Grant root permission failed, please open root permission for NetworkAnalyzer in SecurityCenter and reboot me!</string>
-    <string name="go_now">Go now</string>
+    <string name="category_hack">System and apps</string>
+
+    <string name="title_grant_super">Grant root permission</string>
+    <string name="summary_grant_super">This app should grant root permission</string>
+    <string name="summary_super_granted">Root permission granted</string>
+    <string name="dlg_title_grant_super_failed">Root failed</string>
+    <string name="dlg_msg_grant_super_failed">Grant root permission failed, please open root permission for NetworkAnalyzer in SecurityCenter and reboot me!</string>
+    <string name="dlg_go_now">Go now</string>
     <string name="info_no_super">Please grant root permission first!</string>
 
     <string name="dlg_cancel">Cancel</string>
@@ -14,14 +17,20 @@
     <string name="dlg_continue">Continue</string>
 
     <!-- wechat xlog -->
-    <string name="xlog_hack">One key hack wechat</string>
-    <string name="xlog_hack_dlg_title">Hack wechat</string>
-    <string name="xlog_hack_dlg_warning">Hack wechat may cause wechat stop, are you sure to continue?</string>
-    <string name="xlog_hack_running">Hacking process is running...</string>
-    <string name="xlog_hack_hacked">Wechat is hacked</string>
-    <string name="xlog_hack_failed">Wechat hack failed, try again</string>
+    <string name="title_xlog_hack">One key hack wechat</string>
+    <string name="summary_xlog_hack">Show wechat xlog in logcat</string>
+    <string name="summary_xlog_hack_running">Hacking process is running...</string>
+    <string name="summary_xlog_hack_hacked">Wechat is hacked</string>
+    <string name="summary_xlog_hack_failed">Wechat hack failed, try again</string>
+    <string name="dlg_title_xlog_hack">Hack wechat</string>
+    <string name="dlg_msg_xlog_hack_warning">Hack wechat may cause wechat stop, are you sure to continue?</string>
 
-    <string name="network_monitor">One key network monitor</string>
-    <string name="capture_tcpdump">Capture tcpdump</string>
-    <string name="connection_monitor">Tcp connection monitor</string>
+    <string name="category_monitor">Network monitor</string>
+    <string name="title_message_delay">Message delay monitor</string>
+    <string name="summary_message_delay">Monitor message delay for wechat or mobile qq</string>
+    <string name="summary_message_delay_running">Message delay monitor is running</string>
+    <string name="title_tcpdump">Packet monitor</string>
+    <string name="summary_tcpdump">Monitor packet transfer for specific interface</string>
+    <string name="title_tcp_connection">Tcp connection monitor</string>
+    <string name="summary_tcp_connection">Monitor for tcp connection for specific app</string>
 </resources>

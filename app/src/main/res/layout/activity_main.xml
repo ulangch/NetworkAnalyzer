@@ -17,34 +17,5 @@
                 android:text="@string/super_granted"
                 android:textColor="@color/colorRed"/>-->
 
-    <Button
-        android:id="@+id/btn_grant_super"
-        android:layout_width="match_parent"
-        android:layout_height="65dip"
-        android:text="@string/grant_super"
-        android:textColor="@color/colorRed"/>
-
-    <Button
-        android:id="@+id/btn_hack_wechat"
-        android:layout_width="match_parent"
-        android:layout_height="65dip"
-        android:text="@string/xlog_hack" />
-    <Button
-        android:id="@+id/btn_capture_tcpdump"
-        android:layout_width="match_parent"
-        android:layout_height="65dip"
-        android:text="@string/capture_tcpdump"/>
-    <Button
-        android:id="@+id/btn_connection_monitor"
-        android:layout_width="match_parent"
-        android:layout_height="65dip"
-        android:text="@string/connection_monitor"/>
-
-    <Button
-        android:id="@+id/btn_network_monitor"
-        android:layout_marginTop="15dip"
-        android:layout_width="match_parent"
-        android:layout_height="65dip"
-        android:text="@string/network_monitor"/>
 
 </LinearLayout>

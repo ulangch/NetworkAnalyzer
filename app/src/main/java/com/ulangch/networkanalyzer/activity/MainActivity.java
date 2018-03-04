@@ -7,15 +7,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
@@ -25,12 +29,18 @@ import com.ulangch.networkanalyzer.service.IAnalyzerServiceBinder;
 import com.ulangch.networkanalyzer.service.IAnalyzerServiceCallback;
 import com.ulangch.networkanalyzer.utils.AnalyzerUtils;
 
-public class MainActivity extends AppCompatActivity implements ServiceConnection, View.OnClickListener{
+public class MainActivity extends PreferenceActivity implements ServiceConnection
+        , Preference.OnPreferenceClickListener{
     private static final String TAG = "MainActivity";
 
     private static final String PACKAGE_ROOT_CENTER = "com.miui.securitycenter";
     private static final String ACTIVITY_ROOT_CENTER = "com.miui.permcenter.MainAcitivty";
 
+    private static final String KEY_GRANT_SUPER = "preference_super";
+    private static final String KEY_HACK_WECHAT = "preference_xlog";
+    private static final String KEY_MESSAGE_DELAY_MONITOR = "preference_message_delay";
+    private static final String KEY_TCPDUMP_MONITOR = "preference_tcpdump";
+    private static final String KEY_TCP_CONNECTION = "preference_tcp_connection";
 
     private static final int UHDL_SUPER_PERMISSION_RESULT = 0x01;
     private static final int UHDL_HACK_WECHAT_RESULT = 0x02;
@@ -39,11 +49,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private UiHandler mUiHandler;
     private IAnalyzerServiceBinder mAnalyzerService;
 
-    private Button mSuperGrantButton;
-    private Button mHackWechatButton;
-    private Button mNetworkMonitorButton;
-    private Button mTcpdumpButton;
-    private Button mConnectionMonitorButton;
+    private Preference mSuperPreference;
+    private Preference mWechatPreference;
+    private Preference mMessageDelayPreference;
+    private Preference mTcpdumpPreference;
+    private Preference mTcpConnPreference;
 
     private boolean mSuperGranted = false;
     private boolean mWechatHacked = false;
@@ -51,16 +61,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mSuperGrantButton = (Button) findViewById(R.id.btn_grant_super);
-        mHackWechatButton = (Button) findViewById(R.id.btn_hack_wechat);
-        mNetworkMonitorButton = (Button) findViewById(R.id.btn_network_monitor);
-        mTcpdumpButton = (Button) findViewById(R.id.btn_capture_tcpdump);
-        mConnectionMonitorButton = (Button) findViewById(R.id.btn_connection_monitor);
-        mHackWechatButton.setOnClickListener(this);
-        mNetworkMonitorButton.setOnClickListener(this);
-        mTcpdumpButton.setOnClickListener(this);
-        mConnectionMonitorButton.setOnClickListener(this);
+        addPreferencesFromResource(R.xml.preference_main);
+        mSuperPreference = findPreference(KEY_GRANT_SUPER);
+        mWechatPreference = findPreference(KEY_HACK_WECHAT);
+        mMessageDelayPreference = findPreference(KEY_MESSAGE_DELAY_MONITOR);
+        mTcpdumpPreference = findPreference(KEY_TCPDUMP_MONITOR);
+        mTcpConnPreference = findPreference(KEY_TCP_CONNECTION);
+        mSuperPreference.setOnPreferenceClickListener(this);
+        mWechatPreference.setOnPreferenceClickListener(this);
+        mMessageDelayPreference.setOnPreferenceClickListener(this);
+        mTcpdumpPreference.setOnPreferenceClickListener(this);
+        mTcpConnPreference.setOnPreferenceClickListener(this);
         mUiHandler = new UiHandler(this.getMainLooper());
         Intent service = new Intent();
         service.setClass(getApplicationContext(), AnalyzerService.class);
@@ -113,17 +124,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private void handleGrantSuperPermissionResult(boolean granted) {
         if (granted) {
-            mSuperGrantButton.setText(getString(R.string.super_granted));
-            mSuperGrantButton.setTextColor(getColor(R.color.colorPrimary));
-            mSuperGrantButton.setEnabled(false);
+            mSuperPreference.setSummary(R.string.summary_super_granted);
+            mSuperPreference.setEnabled(false);
         } else {
-            mSuperGrantButton.setText(getString(R.string.grant_super));
-            mSuperGrantButton.setTextColor(getColor(R.color.colorRed));
-            mSuperGrantButton.setEnabled(true);
+            mSuperPreference.setSummary(R.string.summary_grant_super);
+            mSuperPreference.setEnabled(true);
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.title_grant_super_failed))
-                    .setMessage(getString(R.string.msg_grant_super_failed))
-                    .setPositiveButton(R.string.go_now, new DialogInterface.OnClickListener() {
+                    .setTitle(getString(R.string.dlg_title_grant_super_failed))
+                    .setMessage(getString(R.string.dlg_msg_grant_super_failed))
+                    .setPositiveButton(R.string.dlg_go_now, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Intent intent = new Intent();
@@ -149,14 +158,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private void hackWechatXLog() {
         if (ensureSuperGranted()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.xlog_hack_dlg_title))
-                    .setMessage(getString(R.string.xlog_hack_dlg_warning))
+                    .setTitle(getString(R.string.dlg_title_xlog_hack))
+                    .setMessage(getString(R.string.dlg_msg_xlog_hack_warning))
                     .setPositiveButton(R.string.dlg_continue, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            if (mHackWechatButton != null) {
-                                mHackWechatButton.setText(getString(R.string.xlog_hack_running));
-                                mHackWechatButton.setEnabled(false);
+                            if (mWechatPreference != null) {
+                                mWechatPreference.setSummary(getString(R.string.summary_xlog_hack_running));
+                                mWechatPreference.setEnabled(false);
                             }
                             dialogInterface.dismiss();
                             try {
@@ -174,39 +183,38 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private void handleHackWechatXLogResult(boolean isCheck, boolean hacked) {
         if (hacked) {
-            mHackWechatButton.setText(getString(R.string.xlog_hack_hacked));
-            mHackWechatButton.setTextColor(getColor(R.color.colorPrimary));
-            mHackWechatButton.setEnabled(false);
+            mWechatPreference.setSummary(getString(R.string.summary_xlog_hack_hacked));
+            mWechatPreference.setEnabled(false);
         } else {
             if (isCheck) {
-                mHackWechatButton.setText(getString(R.string.xlog_hack));
+                mWechatPreference.setSummary(getString(R.string.summary_xlog_hack));
             } else {
-                mHackWechatButton.setText(getString(R.string.xlog_hack_failed));
-                mHackWechatButton.setTextColor(getColor(R.color.colorRed));
+                mWechatPreference.setSummary(getString(R.string.summary_xlog_hack_failed));
             }
-            mHackWechatButton.setEnabled(true);
-            mHackWechatButton.setOnClickListener(this);
+            mWechatPreference.setEnabled(true);
         }
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_grant_super:
-                grantSuperPermission();
-                break;
-            case R.id.btn_hack_wechat:
-                hackWechatXLog();
-                break;
-            case R.id.btn_network_monitor:
-                break;
-            case R.id.btn_capture_tcpdump:
-                break;
-            case R.id.btn_connection_monitor:
-                break;
-            default:
-                break;
+    public boolean onPreferenceClick(Preference preference) {
+        String key = preference.getKey();
+        if (TextUtils.isEmpty(key)) {
+            return false;
         }
+        if (KEY_GRANT_SUPER.equals(key)) {
+            grantSuperPermission();
+        } else if (KEY_HACK_WECHAT.equals(key)) {
+            hackWechatXLog();
+        } else if (KEY_MESSAGE_DELAY_MONITOR.equals(key)) {
+            Intent intent = new Intent();
+            intent.setClass(this, MessageDelayActivity.class);
+            startActivity(intent);
+        } else if (KEY_TCPDUMP_MONITOR.equals(key)) {
+
+        } else if (KEY_TCP_CONNECTION.equals(key)) {
+
+        }
+        return true;
     }
 
     private class UiHandler extends Handler {
