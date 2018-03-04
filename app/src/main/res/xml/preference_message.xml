@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/category_message_delay_run">
+        <SwitchPreference
+            android:key="preference_message_delay_run"
+            android:title="@string/title_message_delay_run"
+            android:summary="@string/summary_message_delay_closed" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/category_message_delay_configure">
+        <Preference
+            android:key="preference_message_delay_configure_store"
+            android:title="@string/title_message_delay_store"
+            android:summary="@string/summary_message_delay_store_default"/>
+        <Preference
+            android:key="preference_message_delay_configure_app"
+            android:title="@string/title_message_delay_app_select"
+            android:summary="@string/summary_message_delay_app_non"/>
+        <SwitchPreference
+            android:key="preference_message_delay_configure_tcpdump"
+            android:title="@string/title_message_delay_tcpdump" />
+        <SwitchPreference
+            android:key="preference_message_delay_configure_tcp_connection"
+            android:title="@string/title_message_delay_tcp_connection" />
+        <SwitchPreference
+            android:key="preference_message_delay_configure_log"
+            android:title="@string/title_message_delay_log" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
