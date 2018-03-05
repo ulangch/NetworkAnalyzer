@@ -1,5 +1,6 @@
 package com.ulangch.networkanalyzer.monitor;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.ulangch.networkanalyzer.service.AnalyzerServiceBinder;
@@ -12,7 +13,7 @@ import com.ulangch.networkanalyzer.utils.AnalyzerUtils;
 public class PacketMonitor extends BaseMonitor{
     private static final String TAG = "PacketMonitor";
 
-    private static final String PACKET_FILE_NAME = "tcpdump.pcap";
+    public static final String PACKET_FILE_NAME_DEFAULT = "tcpdump.pcap";
 
     public static final String PACKET_DIRECTORY_DEFAULT =AnalyzerUtils.DEFAULT_FILE_STORAGE_PATH + "/" + "PacketMonitor";
 
@@ -37,7 +38,7 @@ public class PacketMonitor extends BaseMonitor{
         }
         mPacketConf = new PacketMonitorConfiguration((PacketMonitorConfiguration) conf);
         if (mMonitorRunning == mPacketConf.enable) {
-            return "Packet monitor is already" + (mMonitorRunning ? "started" : "stopped");
+            return "Packet monitor is already" + (mMonitorRunning ? " started" : " stopped");
         }
         if (!mPacketConf.enable) {
             return stop();
@@ -58,11 +59,16 @@ public class PacketMonitor extends BaseMonitor{
 
         StringBuilder command = new StringBuilder();
         command.append("tcpdump ");
-        command.append("-i ").append(mPacketConf.iface != null ? mPacketConf.iface : "any").append(" ");
-        command.append("-w ").append(getStoragePath() + "/" + PACKET_FILE_NAME);
-
+        command.append("-i ").append(!TextUtils.isEmpty(mPacketConf.iface) ? mPacketConf.iface : "any").append(" ");
+        command.append("-w ").append(getStoragePath()).append("/").append(
+                !TextUtils.isEmpty(mPacketConf.fileName) ? mPacketConf.fileName : PACKET_FILE_NAME_DEFAULT);
+        command.append(" &");
         AnalyzerUtils.logd("wuliang", "command=" + command.toString());
 
+        String executeResult = mSuperExecutor.execute(command.toString(), true);
+        AnalyzerUtils.logd("wuliang", "executeResult=" + executeResult);
+
+        //TODO: KILL TCPDUMP http://bbs.csdn.net/topics/100176432
         return null;
     }
 
@@ -83,9 +89,11 @@ public class PacketMonitor extends BaseMonitor{
                 enable = source.enable;
                 storagePath = source.storagePath;
                 iface = source.iface;
+                fileName = source.fileName;
             }
         }
 
         public String iface;
+        public String fileName;
     }
 }

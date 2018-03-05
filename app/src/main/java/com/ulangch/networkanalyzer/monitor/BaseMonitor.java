@@ -41,7 +41,7 @@ public abstract class BaseMonitor {
     }
 
     public static class MonitorConfiguration{
-        public boolean enable;
+        public boolean enable = true;
         public String storagePath;
     }
 

@@ -174,6 +174,7 @@ public class AnalyzerServiceBinder extends Binder {
                     break;
                 case HDL_START_PACKET_MONITOR:
                     String startPacketMonitorResult = mPacketMonitor.monitor((PacketMonitorConfiguration) msg.obj);
+                    AnalyzerUtils.logd("wuliang", "startPacketMonitorResult=" + startPacketMonitorResult);
                     synchronized (mCallbacks) {
                         for (AnalyzerServiceCallback callback : mCallbacks) {
                             callback.onPacketMonitorStart(mPacketMonitor.status(), startPacketMonitorResult);

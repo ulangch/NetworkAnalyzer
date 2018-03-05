@@ -54,6 +54,10 @@
     <string name="default_tcpdump_configure_file_name">tcpdump.pcap</string>
     <string name="title_tcpdump_configure_directory">Storage directory</string>
 
+    <string name="starting">Starting</string>
+    <string name="start_failed">Start failed</string>
+    <string name="stopping">Stopping</string>
+    <string name="stop_failed">Stop failed</string>
     <string name="running">Running...</string>
     <string name="closed">Closed</string>
     <string name="configuration">Configuration</string>
