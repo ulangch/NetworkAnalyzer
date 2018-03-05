@@ -16,4 +16,5 @@ interface IAnalyzerServiceBinder {
     boolean grantSuperPermission();
     void hackWechatXLog();
     void checkWechatXLogHacked();
+    void runMessageDelayMonitor();
 }

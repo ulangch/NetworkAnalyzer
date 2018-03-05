@@ -24,13 +24,14 @@ import android.view.View;
 import android.widget.Button;
 
 import com.ulangch.networkanalyzer.R;
+import com.ulangch.networkanalyzer.monitor.PacketMonitor;
 import com.ulangch.networkanalyzer.service.AnalyzerService;
-import com.ulangch.networkanalyzer.service.IAnalyzerServiceBinder;
-import com.ulangch.networkanalyzer.service.IAnalyzerServiceCallback;
+import com.ulangch.networkanalyzer.service.AnalyzerServiceBinder;
+import com.ulangch.networkanalyzer.service.AnalyzerServiceCallback;
 import com.ulangch.networkanalyzer.utils.AnalyzerUtils;
 
 public class MainActivity extends PreferenceActivity implements ServiceConnection
-        , Preference.OnPreferenceClickListener{
+        , Preference.OnPreferenceClickListener {
     private static final String TAG = "MainActivity";
 
     private static final String PACKAGE_ROOT_CENTER = "com.miui.securitycenter";
@@ -47,7 +48,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
     private static final int UHDL_HACK_WECHAT_CHECK_RESULT = 0x03;
 
     private UiHandler mUiHandler;
-    private IAnalyzerServiceBinder mAnalyzerService;
+    private AnalyzerServiceBinder mAnalyzerService;
 
     private Preference mSuperPreference;
     private Preference mWechatPreference;
@@ -57,6 +58,11 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
 
     private boolean mSuperGranted = false;
     private boolean mWechatHacked = false;
+    private boolean mMessageDelayMonitorRunning = false;
+    private boolean mPacketMonitorRunning = false;
+    private boolean mTcpConnMonitorRunning = false;
+
+    private volatile boolean mRefreshed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,28 +87,51 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
 
     @Override
     protected void onResume() {
+        mRefreshed = false;
+        if (mAnalyzerService != null && mAnalyzerService.isBinderAlive()) {
+            refresh();
+        }
         super.onResume();
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public void onServiceConnected(ComponentName componentName, IBinder service) {
-        mAnalyzerService = IAnalyzerServiceBinder.Stub.asInterface(service);
-        grantSuperPermission();
-        try {
-            mAnalyzerService.registerCallback(mAnalyzerCallback);
-            if (mSuperGranted) {
-                mAnalyzerService.checkWechatXLogHacked();
-            }
-        } catch (RemoteException e) {
-        }
+        mAnalyzerService = (AnalyzerServiceBinder) service;
+        mAnalyzerService.registerCallback(mAnalyzerCallback);
+        refresh();
     }
 
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
-        try {
-            mAnalyzerService.unRegisterCallback(mAnalyzerCallback);
-        } catch (RemoteException e) {
+        mAnalyzerService.unRegisterCallback(mAnalyzerCallback);
+    }
+
+    private void refresh() {
+        grantSuperPermission();
+        if (mSuperGranted) {
+            mAnalyzerService.checkWechatXLogHacked();
+            if (mMessageDelayMonitorRunning != mAnalyzerService.isMessageDelayMonitorRunning()) {
+                mMessageDelayMonitorRunning = !mMessageDelayMonitorRunning;
+                mMessageDelayPreference.setSummary(mMessageDelayMonitorRunning
+                        ? (R.string.summary_message_delay_running) : (R.string.summary_message_delay));
+            }
+            if (mPacketMonitorRunning != mAnalyzerService.isPacketMonitorRunning()) {
+                mPacketMonitorRunning = !mPacketMonitorRunning;
+                mTcpdumpPreference.setSummary(mPacketMonitorRunning
+                        ? (R.string.summary_tcpdump_running) : (R.string.summary_tcpdump));
+            }
+            if (mTcpConnMonitorRunning != mAnalyzerService.isTcpConnMonitorRunning()) {
+                mTcpConnMonitorRunning = !mTcpConnMonitorRunning;
+                mTcpConnPreference.setSummary(mTcpConnMonitorRunning
+                        ? (R.string.summary_tcp_connection_running) : (R.string.summary_tcp_connection));
+            }
         }
+        mRefreshed = true;
     }
 
     private void grantNormalPermission() {
@@ -113,12 +142,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
     }
 
     private void grantSuperPermission() {
-        try {
-            mSuperGranted = mAnalyzerService.grantSuperPermission();
-        } catch (RemoteException e) {
-            AnalyzerUtils.loge(TAG, "Exception occur while grant super permission", e);
-            mSuperGranted = false;
-        }
+        mSuperGranted = mAnalyzerService.grantSuperPermission();
         mUiHandler.sendMessage(mUiHandler.obtainMessage(UHDL_SUPER_PERMISSION_RESULT, mSuperGranted ? 1 : 0, 0));
     }
 
@@ -168,12 +192,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
                                 mWechatPreference.setEnabled(false);
                             }
                             dialogInterface.dismiss();
-                            try {
-                                mAnalyzerService.hackWechatXLog();
-                            } catch (RemoteException e) {
-                                AnalyzerUtils.loge(TAG, "Exception occur while hack wechat xlog", e);
-                                mUiHandler.sendMessage(mUiHandler.obtainMessage(UHDL_HACK_WECHAT_RESULT, 0, 0));
-                            }
+                            mAnalyzerService.hackWechatXLog();
                         }
                     })
                     .setNegativeButton(R.string.dlg_cancel, null);
@@ -182,6 +201,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
     }
 
     private void handleHackWechatXLogResult(boolean isCheck, boolean hacked) {
+        mWechatHacked = hacked;
         if (hacked) {
             mWechatPreference.setSummary(getString(R.string.summary_xlog_hack_hacked));
             mWechatPreference.setEnabled(false);
@@ -198,6 +218,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
     @Override
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
+        Intent intent = new Intent();
         if (TextUtils.isEmpty(key)) {
             return false;
         }
@@ -206,11 +227,15 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
         } else if (KEY_HACK_WECHAT.equals(key)) {
             hackWechatXLog();
         } else if (KEY_MESSAGE_DELAY_MONITOR.equals(key)) {
-            Intent intent = new Intent();
             intent.setClass(this, MessageDelayActivity.class);
             startActivity(intent);
         } else if (KEY_TCPDUMP_MONITOR.equals(key)) {
-
+            /*PacketMonitor.PacketMonitorConfiguration conf = new PacketMonitor.PacketMonitorConfiguration();
+            conf.enable = true;
+            conf.iface = "rmnet_data0";
+            mAnalyzerService.runPacketMonitor(conf);*/
+            intent.setClass(this, PacketMonitorActivity.class);
+            startActivity(intent);
         } else if (KEY_TCP_CONNECTION.equals(key)) {
 
         }
@@ -241,7 +266,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
         }
     }
 
-    private IAnalyzerServiceCallback mAnalyzerCallback = new IAnalyzerServiceCallback.Stub() {
+    private AnalyzerServiceCallback mAnalyzerCallback = new AnalyzerServiceCallback() {
         @Override
         public void onWechatXLogHacked(boolean hack) {
             mUiHandler.sendMessage(mUiHandler.obtainMessage(UHDL_HACK_WECHAT_RESULT, hack ? 1 : 0, 0));

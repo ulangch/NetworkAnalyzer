@@ -22,9 +22,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.MessageDelayActivity" />
+        <activity android:name=".activity.PacketMonitorActivity" />
 
-        <service android:name=".service.AnalyzerService"
-            android:process="com.ulangch.networkanalyzer.analyzerservice">
+        <service android:name=".service.AnalyzerService" >
+            <!--android:process="com.ulangch.networkanalyzer.analyzerservice"-->
             <intent-filter>
                 <action android:name="com.ulangch.networkanalyzer.service"/>
                 <category android:name="android.intent.category.DEFAULT"/>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="@string/title_tcpdump">
+        <SwitchPreference
+            android:key="preference_tcpdump_run"
+            android:title="@string/title_tcpdump_run"
+            android:summary="@string/closed"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/configuration">
+        <ListPreference
+            android:key="preference_tcpdump_configure_iface"
+            android:title="@string/title_tcpdump_configure_iface"
+            android:summary="@string/default_tcpdump_configure_iface"
+            android:entryValues="@array/entries_iface"
+            android:entries="@array/entries_iface"/>
+        <EditTextPreference
+            android:key="preference_tcpdump_configure_file"
+            android:title="@string/title_tcpdump_configure_file_name"
+            android:summary="@string/default_tcpdump_configure_file_name"/>
+        <EditTextPreference
+            android:key="preference_tcpdump_configure_directory"
+            android:enabled="false"
+            android:title="@string/title_tcpdump_configure_directory"/>
+    </PreferenceCategory>
+</PreferenceScreen>

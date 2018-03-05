@@ -1,15 +1,12 @@
 package com.ulangch.networkanalyzer.service;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.ulangch.networkanalyzer.R;
 import com.ulangch.networkanalyzer.utils.AnalyzerUtils;
 
 /**

@@ -1,6 +1,7 @@
 package com.ulangch.networkanalyzer.utils;
 
 import android.content.Context;
+import android.os.Environment;
 import android.system.ErrnoException;
 import android.system.Os;
 import android.system.StructStat;
@@ -19,6 +20,8 @@ public class AnalyzerUtils {
     private static final String SEPERATOR_FILE = "/";
     private static final char[] HEX_ALPHABET = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f',};
+
+    public static final String DEFAULT_FILE_STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NetworkAnalyzer";
 
     public static File getCacheDir(Context ctx) {
         return ctx.getCacheDir();
@@ -65,6 +68,17 @@ public class AnalyzerUtils {
             file.mkdir();
         }
         return file;
+    }
+
+    public static void ensureAnalyzerStorageDirectory() {
+        ensureDirectory(DEFAULT_FILE_STORAGE_PATH);
+    }
+
+    public static void ensureDirectory(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 
     public static String bytesToHexString(byte[] bytes) {

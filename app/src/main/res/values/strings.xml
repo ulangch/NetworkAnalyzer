@@ -28,17 +28,16 @@
     <string name="category_monitor">Network monitor</string>
     <string name="title_message_delay">Message delay monitor</string>
     <string name="summary_message_delay">Monitor message delay for wechat or mobile qq</string>
-    <string name="summary_message_delay_running_1">Message delay monitor is running</string>
+    <string name="summary_message_delay_running">Message delay monitor is running...</string>
     <string name="title_tcpdump">Packet monitor</string>
     <string name="summary_tcpdump">Monitor packet transfer for specific interface</string>
+    <string name="summary_tcpdump_running">Packet monitor is running...</string>
     <string name="title_tcp_connection">Tcp connection monitor</string>
     <string name="summary_tcp_connection">Monitor for tcp connection for specific app</string>
+    <string name="summary_tcp_connection_running">Tcp connection monitor is running...</string>
     
     <string name="category_message_delay_run">Message delay monitor</string>
     <string name="title_message_delay_run">Run message delay Monitor</string>
-    <string name="summary_message_delay_running_2">Running</string>
-    <string name="summary_message_delay_closed">Closed</string>
-    <string name="category_message_delay_configure">Configuration</string>
     <string name="title_message_delay_store">File storage location</string>
     <string name="summary_message_delay_store_default">/sdcard/network_analyzer</string>
     <string name="title_message_delay_app_select">Interested app selection</string>
@@ -46,4 +45,16 @@
     <string name="title_message_delay_log">Logcat monitor</string>
     <string name="title_message_delay_tcpdump">Packet monitor</string>
     <string name="title_message_delay_tcp_connection">Tcp connection monitor</string>
+
+    <string name="category_tcpdump">Packet monitor</string>
+    <string name="title_tcpdump_run">Run packet monitor</string>
+    <string name="title_tcpdump_configure_iface">Interface selection</string>
+    <string name="default_tcpdump_configure_iface">wlan0</string>
+    <string name="title_tcpdump_configure_file_name">Storage file name</string>
+    <string name="default_tcpdump_configure_file_name">tcpdump.pcap</string>
+    <string name="title_tcpdump_configure_directory">Storage directory</string>
+
+    <string name="running">Running...</string>
+    <string name="closed">Closed</string>
+    <string name="configuration">Configuration</string>
 </resources>

@@ -13,4 +13,5 @@ interface IAnalyzerServiceCallback {
 
     void onWechatXLogHacked(boolean hack);
     void onWechatXLogHackCheck(boolean hack);
+    void onMessageDelayMonitorStatusChanged(boolean running);
 }
