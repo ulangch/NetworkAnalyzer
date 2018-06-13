@@ -26,9 +26,9 @@ public class XLogHacker{
     private static final String XLOG_TEMP_HACK_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "/xlog_hack";
     private static final String XLOG_TEMP_ORIGIN_FILE = XLOG_TEMP_HACK_DIR + "/libwechatxlog.org";
     private static final String XLOG_TEMP_HACK_FILE = XLOG_TEMP_HACK_DIR + SEPERATOR_FILE + XLOG_FILE_WECHAT;
-    private static final String XLOG_HEX_TO_HACK = "6d00001a";
-    private static final String XLOG_HEX_HACKED = "6d0000ea";
-    private static final String XLOG_HEX_HACK = "ea";
+    private static final String XLOG_HEX_TO_HACK = "3100001a";
+    private static final String XLOG_HEX_HACKED = "310000eb";
+    private static final String XLOG_HEX_HACK = "eb";
 
     public static final int HACK_CODE_FAILED = 0x01;
     public static final int HACK_CODE_SUCCESS = 0x02;
