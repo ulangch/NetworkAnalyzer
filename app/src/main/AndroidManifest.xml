@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".activity.MessageDelayActivity" />
         <activity android:name=".activity.PacketMonitorActivity" />
+        <activity android:name=".activity.LogcatMonitorActivity" />
 
         <service android:name=".service.AnalyzerService" >
             <!--android:process="com.ulangch.networkanalyzer.analyzerservice"-->

@@ -1,41 +1,34 @@
 package com.ulangch.networkanalyzer.service;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Process;
 
+import com.ulangch.networkanalyzer.R;
 import com.ulangch.networkanalyzer.utils.AnalyzerUtils;
 
-/**
- * Created by xyzc on 18-2-28.
- */
-
-public class AnalyzerService extends Service{
+public class AnalyzerService extends Service {
     private static final String TAG = "AnalyzerService";
 
     private Binder mServiceBinder;
-    private Notification mNoticication;
-    private NotificationManager mNotificationManager;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         AnalyzerUtils.logd(TAG, "onStartCommand");
-
+        Notification n = new Notification.Builder(getApplicationContext())
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.service_running))
+                .setSmallIcon(R.mipmap.ic_launcher).build();
+        startForeground(Process.myPid(), n);
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onCreate() {
-        /*AnalyzerUtils.logd(TAG, "onCreate");
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification.Builder builder = new Notification.Builder(this)
-                .setContentTitle("Analyzer Service")
-                .setContentText("Analyzer service is running")
-                .setSmallIcon(R.mipmap.ic_launcher);
-        mNoticication = builder.build();*/
+        AnalyzerUtils.logd(TAG, "onCreate");
         super.onCreate();
     }
 
@@ -58,6 +51,7 @@ public class AnalyzerService extends Service{
     public void onDestroy() {
         AnalyzerUtils.logd(TAG, "onDestroy");
         if (mServiceBinder != null) {
+            ((AnalyzerServiceBinder) mServiceBinder).onDestroy();
             mServiceBinder = null;
         }
         super.onDestroy();

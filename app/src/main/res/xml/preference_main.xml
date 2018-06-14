@@ -15,6 +15,14 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/category_logcat">
+        <Preference android:key="preference_logcat"
+            android:title="@string/title_logcat_monitor"
+            android:summary="@string/summary_logcat_monitor"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/category_monitor">
         <Preference
             android:key="preference_message_delay"

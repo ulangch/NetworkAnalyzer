@@ -7,6 +7,8 @@ package com.ulangch.networkanalyzer.service;
 public class AnalyzerServiceCallback {
     public void onWechatXLogHacked(boolean hack) {}
     public void onWechatXLogHackCheck(boolean hack) {}
+    public void onLogcatMonitorStart(boolean running, String info) {}
+    public void onLogcatMonitorStop(boolean running, String info) {}
     public void onMessageMonitorStart(boolean running, String info){}
     public void onMessageMonitorStop(boolean running, String info) {}
     public void onPacketMonitorStart(boolean running, String info) {}

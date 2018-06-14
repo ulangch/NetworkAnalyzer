@@ -25,6 +25,14 @@
     <string name="dlg_title_xlog_hack">Hack wechat</string>
     <string name="dlg_msg_xlog_hack_warning">Hack wechat may cause wechat stop, are you sure to continue?</string>
 
+    <string name="category_logcat">Logcat configure</string>
+    <string name="title_logcat_monitor">Logcat monitor</string>
+    <string name="summary_logcat_monitor">Capture logs into specified files</string>
+    <string name="summary_logcat_monitor_running">Logcat monitor is running...</string>
+    <string name="title_logcat_monitor_run">Run logcat monitor</string>
+    <string name="title_logcat_store">File storage location</string>
+    <string name="summary_logcat_store_default">/sdcard/NetworkAnalyzer/logcat</string>
+
     <string name="category_monitor">Network monitor</string>
     <string name="title_message_delay">Message delay monitor</string>
     <string name="summary_message_delay">Monitor message delay for wechat or mobile qq</string>
@@ -61,4 +69,6 @@
     <string name="running">Running...</string>
     <string name="closed">Closed</string>
     <string name="configuration">Configuration</string>
+
+    <string name="service_running">NetworkAnalyzer service is running</string>
 </resources>

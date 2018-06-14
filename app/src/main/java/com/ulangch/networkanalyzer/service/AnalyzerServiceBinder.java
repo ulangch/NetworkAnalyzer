@@ -13,14 +13,17 @@ import android.text.TextUtils;
 import com.ulangch.networkanalyzer.executor.ExecutorFactory;
 import com.ulangch.networkanalyzer.executor.SuperExecutor;
 import com.ulangch.networkanalyzer.hacker.XLogHacker;
+import com.ulangch.networkanalyzer.monitor.LogcatMonitor;
 import com.ulangch.networkanalyzer.monitor.MessageDelayMonitor;
 import com.ulangch.networkanalyzer.monitor.PacketMonitor;
 import com.ulangch.networkanalyzer.monitor.TcpConnectionMonitor;
+import com.ulangch.networkanalyzer.monitor.LogcatMonitor.LogcatMonitorConfiguration;
 import com.ulangch.networkanalyzer.monitor.MessageDelayMonitor.MessageDelayMonitorConfiguration;
 import com.ulangch.networkanalyzer.monitor.PacketMonitor.PacketMonitorConfiguration;
 import com.ulangch.networkanalyzer.monitor.TcpConnectionMonitor.TcpConnMonitorConfiguration;
 import com.ulangch.networkanalyzer.utils.AnalyzerUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,15 +34,18 @@ import java.util.List;
 public class AnalyzerServiceBinder extends Binder {
     private static final String TAG = "AnalyzerServiceBinder";
 
+    private static final int HDL_INIT_FILE_STORAGE = 0;
     private static final int HDL_GRANT_SUPER_PERMISSION = 0x01;
     private static final int HDL_WECHAT_HACK = 0x02;
     private static final int HDL_WECHAT_HACK_CHECK = 0x03;
-    private static final int HDL_START_PACKET_MONITOR = 0x04;
-    private static final int HDL_START_TCP_CONNECTION_MONITOR = 0x05;
-    private static final int HDL_START_MESSAGE_DELAY_MONITOR = 0x06;
-    private static final int HDL_STOP_PACKET_MONITOR = 0x07;
-    private static final int HDL_STOP_TCP_CONNECTION_MONITOR = 0x08;
-    private static final int HDL_STOP_MESSAGE_DELAY_MONITOR = 0x09;
+    private static final int HDL_START_LOGCAT_MONITOR = 0x04;
+    private static final int HDL_START_PACKET_MONITOR = 0x05;
+    private static final int HDL_START_TCP_CONNECTION_MONITOR = 0x06;
+    private static final int HDL_START_MESSAGE_DELAY_MONITOR = 0x07;
+    private static final int HDL_STOP_LOGCAT_MONITOR = 0x08;
+    private static final int HDL_STOP_PACKET_MONITOR = 0x09;
+    private static final int HDL_STOP_TCP_CONNECTION_MONITOR = 0x10;
+    private static final int HDL_STOP_MESSAGE_DELAY_MONITOR = 0x11;
 
     private Context mContext;
 
@@ -49,6 +55,7 @@ public class AnalyzerServiceBinder extends Binder {
     private SuperExecutor mSuperExecutor;
     private XLogHacker mXLogHacker;
 
+    private LogcatMonitor mLogcatMonitor;
     private PacketMonitor mPacketMonitor;
     private TcpConnectionMonitor mTcpConnMonitor;
     private MessageDelayMonitor mMessageDelayMonitor;
@@ -64,11 +71,26 @@ public class AnalyzerServiceBinder extends Binder {
         mSuperExecutor = ExecutorFactory.makeSuperExecutor();
         mXLogHacker = XLogHacker.makeXLogHacker(mSuperExecutor);
 
+        mLogcatMonitor = new LogcatMonitor(this);
         mPacketMonitor = new PacketMonitor(this);
         mTcpConnMonitor = new TcpConnectionMonitor(this);
         mMessageDelayMonitor = MessageDelayMonitor.get(this);
 
+        mWorkHandler.sendEmptyMessage(HDL_INIT_FILE_STORAGE);
         mWorkHandler.sendEmptyMessage(HDL_GRANT_SUPER_PERMISSION);
+    }
+
+    public void onDestroy() {
+        if (mLogcatMonitor.status()) {
+            mLogcatMonitor.stop();
+        }
+    }
+
+    private void initFileStorage() {
+        File file = new File("/sdcard/NetworkAnalyzer");
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 
     public boolean grantSuperPermission() {
@@ -86,6 +108,18 @@ public class AnalyzerServiceBinder extends Binder {
 
     public void checkWechatXLogHacked() {
         mWorkHandler.sendEmptyMessage(HDL_WECHAT_HACK_CHECK);
+    }
+
+    public void runLogcatMonitor(LogcatMonitorConfiguration conf) {
+        mWorkHandler.sendMessage(mWorkHandler.obtainMessage(HDL_START_LOGCAT_MONITOR, conf));
+    }
+
+    public void stopLogcatMonitor() {
+        mWorkHandler.sendEmptyMessage(HDL_STOP_LOGCAT_MONITOR);
+    }
+
+    public boolean isLogcatMonitorRunning() {
+        return mLogcatMonitor.status();
     }
 
     public void runMessageDelayMonitor(MessageDelayMonitorConfiguration conf) {
@@ -155,6 +189,9 @@ public class AnalyzerServiceBinder extends Binder {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                case HDL_INIT_FILE_STORAGE:
+                    initFileStorage();
+                    break;
                 case HDL_GRANT_SUPER_PERMISSION:
                     mHasSuperPermission = mSuperExecutor.grantSuperPermission(mContext.getPackageCodePath());
                     break;
@@ -172,9 +209,24 @@ public class AnalyzerServiceBinder extends Binder {
                         }
                     }
                     break;
+                case HDL_START_LOGCAT_MONITOR:
+                    String startLogcatMonitorResult = mLogcatMonitor.monitor((LogcatMonitorConfiguration) msg.obj);
+                    synchronized (mCallbacks) {
+                        for (AnalyzerServiceCallback callback : mCallbacks) {
+                            callback.onLogcatMonitorStart(mLogcatMonitor.status(), startLogcatMonitorResult);
+                        }
+                    }
+                    break;
+                case HDL_STOP_LOGCAT_MONITOR:
+                    String stopLogcatMonitorResult = mLogcatMonitor.stop();
+                    synchronized (mCallbacks) {
+                        for (AnalyzerServiceCallback callback : mCallbacks) {
+                            callback.onLogcatMonitorStop(mLogcatMonitor.status(), stopLogcatMonitorResult);
+                        }
+                    }
+                    break;
                 case HDL_START_PACKET_MONITOR:
                     String startPacketMonitorResult = mPacketMonitor.monitor((PacketMonitorConfiguration) msg.obj);
-                    AnalyzerUtils.logd("wuliang", "startPacketMonitorResult=" + startPacketMonitorResult);
                     synchronized (mCallbacks) {
                         for (AnalyzerServiceCallback callback : mCallbacks) {
                             callback.onPacketMonitorStart(mPacketMonitor.status(), startPacketMonitorResult);

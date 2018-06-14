@@ -38,6 +38,11 @@ public class SuperExecutor extends BaseExecutor{
         return success(execute(copyFileCommand.toString(), true));
     }
 
+    public boolean superKillProcess(int procId) {
+        String killProcCommand = "kill " + procId;
+        return success(execute(killProcCommand, true));
+    }
+
     public boolean superKillProcess(String procId) {
         String killProcCommand = "kill " + procId;
         return success(execute(killProcCommand, true));

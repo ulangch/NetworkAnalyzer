@@ -39,6 +39,7 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
 
     private static final String KEY_GRANT_SUPER = "preference_super";
     private static final String KEY_HACK_WECHAT = "preference_xlog";
+    private static final String KEY_LOGCAT_MONITOR = "preference_logcat";
     private static final String KEY_MESSAGE_DELAY_MONITOR = "preference_message_delay";
     private static final String KEY_TCPDUMP_MONITOR = "preference_tcpdump";
     private static final String KEY_TCP_CONNECTION = "preference_tcp_connection";
@@ -52,12 +53,14 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
 
     private Preference mSuperPreference;
     private Preference mWechatPreference;
+    private Preference mLogcatPreference;
     private Preference mMessageDelayPreference;
     private Preference mTcpdumpPreference;
     private Preference mTcpConnPreference;
 
     private boolean mSuperGranted = false;
     private boolean mWechatHacked = false;
+    private boolean mLogcatMonitorRunning = false;
     private boolean mMessageDelayMonitorRunning = false;
     private boolean mPacketMonitorRunning = false;
     private boolean mTcpConnMonitorRunning = false;
@@ -70,11 +73,13 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
         addPreferencesFromResource(R.xml.preference_main);
         mSuperPreference = findPreference(KEY_GRANT_SUPER);
         mWechatPreference = findPreference(KEY_HACK_WECHAT);
+        mLogcatPreference = findPreference(KEY_LOGCAT_MONITOR);
         mMessageDelayPreference = findPreference(KEY_MESSAGE_DELAY_MONITOR);
         mTcpdumpPreference = findPreference(KEY_TCPDUMP_MONITOR);
         mTcpConnPreference = findPreference(KEY_TCP_CONNECTION);
         mSuperPreference.setOnPreferenceClickListener(this);
         mWechatPreference.setOnPreferenceClickListener(this);
+        mLogcatPreference.setOnPreferenceClickListener(this);
         mMessageDelayPreference.setOnPreferenceClickListener(this);
         mTcpdumpPreference.setOnPreferenceClickListener(this);
         mTcpConnPreference.setOnPreferenceClickListener(this);
@@ -115,6 +120,11 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
         grantSuperPermission();
         if (mSuperGranted) {
             mAnalyzerService.checkWechatXLogHacked();
+            if (mLogcatMonitorRunning != mAnalyzerService.isLogcatMonitorRunning()) {
+                mLogcatMonitorRunning = !mLogcatMonitorRunning;
+                mLogcatPreference.setSummary(mLogcatMonitorRunning
+                        ? (R.string.summary_logcat_monitor_running) : (R.string.summary_logcat_monitor));
+            }
             if (mMessageDelayMonitorRunning != mAnalyzerService.isMessageDelayMonitorRunning()) {
                 mMessageDelayMonitorRunning = !mMessageDelayMonitorRunning;
                 mMessageDelayPreference.setSummary(mMessageDelayMonitorRunning
@@ -226,6 +236,9 @@ public class MainActivity extends PreferenceActivity implements ServiceConnectio
             grantSuperPermission();
         } else if (KEY_HACK_WECHAT.equals(key)) {
             hackWechatXLog();
+        } else if (KEY_LOGCAT_MONITOR.equals(key)){
+            intent.setClass(this, LogcatMonitorActivity.class);
+            startActivity(intent);
         } else if (KEY_MESSAGE_DELAY_MONITOR.equals(key)) {
             intent.setClass(this, MessageDelayActivity.class);
             startActivity(intent);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/title_logcat_monitor">
+        <SwitchPreference
+            android:key="preference_logcat_run"
+            android:title="@string/title_logcat_monitor_run"
+            android:summary="@string/closed"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/configuration">
+        <Preference
+            android:key="preference_logcat_cofigure_store"
+            android:title="@string/title_logcat_store"
+            android:summary="@string/summary_logcat_store_default"/>
+    </PreferenceCategory>
+</PreferenceScreen>
